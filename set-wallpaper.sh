@@ -1,17 +1,19 @@
 #!/bin/bash
 
-resolutions=($(xrandr | grep -oP '\d+x\d+\+\d+\+\d+' | cut -d'x' -f1,2))
+string="$(xrandr --listmonitors)"
+resolutions=()
+highest_resolution=0
 
-max_resolution=0
-for resolution in "${resolutions[@]}"; do
-  width=$(echo $resolution | cut -d'x' -f1)
-  height=$(echo $resolution | cut -d'x' -f2)
-  if ((width * height > max_resolution)); then
-    max_resolution=$((width * height))
-    resolutionAxisX=$width
-    resolutionAxisY=$height
+while IFS= read -r line; do
+  if [[ $line =~ ^.*[0-9]+: ]]; then
+    resolution=$(echo "$line" | awk '{split($3,arr, "/"); print arr[1]}')
+    resolutions+=("$resolution")
+
+    if (( resolution > highest_resolution )); then
+      highest_resolution=$resolution
+    fi
   fi
-done
 
-echo $resolutionAxisX x $resolutionAxisY
-styli.sh -r earthporn -w $resolutionAxisX -h $resolutionAxisY
+done <<< "$string"
+
+styli.sh -s earthporn -w "$highest_resolution" -h 1080
