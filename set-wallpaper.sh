@@ -1,19 +1,32 @@
 #!/bin/bash
 
 string="$(xrandr --listmonitors)"
-resolutions=()
-highest_resolution=0
+
+resolutions_w=()
+resolutions_h=()
+
+highest_resolution_w=0
+highest_resolution_h=0
 
 while IFS= read -r line; do
   if [[ $line =~ ^.*[0-9]+: ]]; then
-    resolution=$(echo "$line" | awk '{split($3,arr, "/"); print arr[1]}')
-    resolutions+=("$resolution")
+    resolution_w=$(echo "$line" | awk '{split($3,arr, "/"); print arr[1]}')
+    resolutions_w+=("$resolution_w")
 
-    if (( resolution > highest_resolution )); then
-      highest_resolution=$resolution
+    if (( resolution_w > highest_resolution_w )); then
+      highest_resolution_w=$resolution_w
+    fi
+
+    if [[ $line =~ x([0-9]+) ]]; then
+      resolution_h="${BASH_REMATCH[1]}"
+      resolutions_h+=("$resolution_h")
+    fi
+
+    if (( resolution_h > highest_resolution_h )); then
+      highest_resolution_h=$resolution_h
     fi
   fi
 
 done <<< "$string"
 
-styli.sh -s earthporn -w "$highest_resolution" -h 1080
+styli.sh -s earthporn -w "$highest_resolution_w" -h "$highest_resolution_h"
