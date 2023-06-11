@@ -29,4 +29,4 @@ while IFS= read -r line; do
 
 done <<< "$string"
 
-styli.sh -s earthporn -w "$highest_resolution_w" -h "$highest_resolution_h"
+styli.sh -s nature -w "$highest_resolution_w" -h "$highest_resolution_h"
